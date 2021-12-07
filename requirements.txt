@@ -1,0 +1,4 @@
+dbus-python
+vext
+vext.gi     # allows use of PyGobject in a virtualenv
+requests

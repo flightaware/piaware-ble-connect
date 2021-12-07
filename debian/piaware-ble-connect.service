@@ -1,0 +1,15 @@
+# Systemd service for piaware-ble-connect
+
+[Unit]
+Description=Bluetooth LE service for configuring PiAware
+After=bluetooth.target
+Requires=bluetooth.target
+
+[Service]
+User=piaware-ble-connect
+ExecStart=/usr/bin/python3 /usr/lib/piaware-ble-connect/piaware_ble_connect.py
+Type=simple
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
