@@ -5,7 +5,7 @@ requests to piaware_configurator to configure piaware
 import json
 import requests
 import logging
-from piaware_helpers import get_rpi_model_and_serial_number, get_adsb_site_number
+from piaware_helpers import get_rpi_model_and_serial_number
 
 logger = logging.getLogger('piaware_ble_connect')
 
@@ -101,10 +101,6 @@ def get_ble_advertisement_identifier(BLE_host, BLE_port):
         port (str): Port number of piaware-configurator serving BLE requests
     """
     raspberry_pi_model, serial_number = get_rpi_model_and_serial_number()
-    site_number = get_adsb_site_number()
-
-    if site_number:
-        return f"PiAware - Site {site_number}"
 
     return f"PiAware - {raspberry_pi_model}"
 
