@@ -29,7 +29,7 @@ def http_json_post(url, json_body):
         Returns: JSON response
 
     """
-    request_id = json_body["request_id"]
+    request_id = json_body.get("request_id")
     try:
         r = requests.post(url, json=json_body, timeout=20)
         r.raise_for_status()  # Raises a HTTPError if the status is 4xx, 5xxx
@@ -117,7 +117,7 @@ def advertising_should_be_on(piaware_configurator_url):
         Parameters:
         piaware_configurator_url (str): URL of piaware-configurator to request receiver data from
     '''
-    request = '{"request_id": 12345, "request": "get_device_state"}'
+    request = '{"request": "get_device_state"}'
     response = http_json_post(piaware_configurator_url, json.loads(request))
     if response is None or type(response) is not dict:
         return None
