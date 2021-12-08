@@ -102,38 +102,12 @@ def get_ble_advertisement_identifier(BLE_host, BLE_port):
     """
     raspberry_pi_model, serial_number = get_rpi_model_and_serial_number()
     site_number = get_adsb_site_number()
-    #custom_name = get_custom_name(BLE_host, BLE_port)
-
-    #if custom_name:
-    #    return f"PiAware - {custom_name}"
 
     if site_number:
         return f"PiAware - Site {site_number}"
 
     return f"PiAware - {raspberry_pi_model}"
 
-def get_custom_name(BLE_host, BLE_port):
-    """ Returns custom-name piaware-config value if set
-
-        Parameters:
-        host (str): Host IP of piaware-configurator serving BLE requests
-        port (str): Port number of piaware-configurator serving BLE requests
-    """
-    custom_name = None
-
-    # Get custom-name config setting
-    request = '{"request_id": 12345, "request": "piaware_config_read", "request_payload": ["custom-name"]}'
-    response = handle_request(BLE_host, BLE_port, request)
-    if response is None or type(response) is not dict:
-        return None
-
-    # Extract custom-name
-    try:
-        custom_name = response["response_payload"]["custom-name"]
-    except KeyError:
-        return None
-
-    return custom_name
 
 def advertising_should_be_on(piaware_configurator_url):
     ''' Returns whether BLE peripheral should be in an advertising state.
