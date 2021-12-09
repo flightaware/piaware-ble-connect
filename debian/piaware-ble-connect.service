@@ -4,6 +4,7 @@
 Description=Bluetooth LE service for configuring PiAware
 After=bluetooth.target
 Requires=bluetooth.target
+After=piaware-configurator.service
 
 [Service]
 User=piaware-ble-connect
