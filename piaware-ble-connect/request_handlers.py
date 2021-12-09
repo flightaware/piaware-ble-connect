@@ -94,7 +94,6 @@ def handle_request(host, port, request):
 
 def get_ble_advertisement_identifier(BLE_host, BLE_port):
     """ Returns an identifier name to use when advertising over BLE.
-        Name priority: custom name, site number, Rpi model
 
         Parameters:
         host (str): Host IP of piaware-configurator serving BLE requests
@@ -127,3 +126,24 @@ def advertising_should_be_on(piaware_configurator_url):
         logger.info(f'Could not determine if advertising should be on')
 
     return True
+
+
+def ble_enabled(piaware_configurator_url):
+    ''' Returns whether BLE service is enabled
+
+    '''
+    request = '{"request": "piaware_config_read", "request_payload": ["enable-ble-config"]}'
+    response = http_json_post(piaware_configurator_url, json.loads(request))
+
+    # Something went wrong determining if BLE is enabled. Let's disable it
+    if response is None or type(response) is not dict:
+       return False
+
+    try:
+       ble_enabled = response['response_payload']['enable-ble-config']
+       return True if int(ble_enabled) == 1 else False
+
+    except KeyError:
+       logger.info(f'Could not determine if BLE configuration is enabled')
+
+    return False

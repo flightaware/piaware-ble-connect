@@ -8,12 +8,12 @@ import logging
 import argparse
 from threading import Thread
 import time
-import sys
+import sys, os
 
 import constants
 from bluez import Application, Advertisement, Service, Characteristic
 from bluez import find_adapter
-from request_handlers import handle_request, get_ble_advertisement_identifier, advertising_should_be_on
+from request_handlers import handle_request, get_ble_advertisement_identifier, advertising_should_be_on, ble_enabled
 
 UART_SERVICE_UUID = 'ac8602af-0226-4889-b925-d751bdf70001'
 UART_RX_CHARACTERISTIC_UUID = 'ac8602af-0226-4889-b925-d751bdf70002'
@@ -314,13 +314,14 @@ class BLE_Peripheral():
 class BLE_Service():
     ''' Bluetooth Low Energy service for piaware configuration.
 
-        The service creates creates a BLE Peripheral that advertises and
-        handles requests from connected BLE Central devices. It also spawns
-        a thread to enable/disable advertising mode depending on the PiAware
-        state.
+        The service creates a BLE Peripheral that handles requests from
+        connected BLE Central devices and relays them to the
+        piaware-configurator web server. It also spawns a thread to
+        enable/disable advertising mode depending on the state of receiver.
+
     '''
-    def __init__(self, host, port):
-        self.piaware_configurator_url = f'http://{host}:{port}/configurator'
+    def __init__(self, piaware_configurator_url):
+        self.piaware_configurator_url = piaware_configurator_url
         self.ble_peripheral = None
         self.advertising_monitor = None
 
@@ -339,32 +340,32 @@ class BLE_Service():
 
         '''
         ble_timeout_minutes = 5
+        # Initial 1 minute delay after startup
         time.sleep(60)
-        logger.info(f'Starting advertising monitor')
+        logger.info(f'Starting BLE discovery mode monitor')
         while True:
-            # BLE advertising timeout reached. Disable BLE
+            # BLE advertising timeout reached. Shutdown BLE service
             if ble_timeout_minutes == 0:
-                logger.info(f'Bluetooth discovery enabled timeout reached. Disabling Bluetooth discovery mode.')
+                logger.info(f'Bluetooth discovery enabled timeout reached. Shutting down PiAware Bluetooth service.')
                 self.ble_peripheral.stop_advertising()
-                sys.exit()
+                self.stop_service()
 
             is_advertising = self.ble_peripheral.is_advertising
             should_advertising_be_on = advertising_should_be_on(self.piaware_configurator_url)
 
             # Advertising ON but should be off now. Disable BLE advertising
             if is_advertising == True and should_advertising_be_on == False:
-                logger.info(f'PiAware has been connected and claimed. Disabling Bluetooth discovery mode.')
+                logger.info(f'PiAware has been connected and claimed. Disabling PiAware Bluetooth discovery mode.')
                 self.ble_peripheral.stop_advertising()
-                sys.exit()
 
-            # Advertising OFF and should be OFF. Do nothing
+            # Advertising OFF and should be OFF. But let's leave the service on until BLE timeout reached. Existing connections may still need it.
             elif is_advertising == False and should_advertising_be_on == False:
-                logger.info(f'Bluetooth discovery mode is disabled')
-                sys.exit()
+                logger.debug(f'BLE Discovery mode is OFF')
+                pass
 
             # Advertising OFF and should be ON. Enable BLE advertising
             elif is_advertising == False and should_advertising_be_on == True:
-                logger.info(f'PiAware is not connected to FlightAware and/or unclaimed. Enabling BLE discovery mode.')
+                logger.info(f'PiAware is not connected to FlightAware and/or unclaimed. Enabling PiAware Bluetooth discovery mode.')
                 self.ble_peripheral.start_advertising()
 
             time.sleep(60)
@@ -373,9 +374,8 @@ class BLE_Service():
 
     def stop_service(self):
         logger.info(f'Stopping Bluetooth Low Energy service for piaware configuration')
-        self.ble_peripheral.stop_advertising()
         self.ble_peripheral.unregister_application()
-        sys.exit(0)
+        os._exit(0)
 
 def main():
     global BLE_host
@@ -386,14 +386,18 @@ def main():
 
     BLE_host = args.host
     BLE_port = args.port
+    piaware_configurator_url = f'http://{BLE_host}:{BLE_port}/configurator'
 
-    ble_service = BLE_Service(BLE_host, BLE_port)
-    try:
-        ble_service.start_service()
-    except KeyboardInterrupt:
-        ble_service.stop_service()
-        logger.info(f'Keyboard exit')
-
+    if ble_enabled(piaware_configurator_url):
+       ble_service = BLE_Service(piaware_configurator_url)
+       try:
+           ble_service.start_service()
+       except KeyboardInterrupt:
+           ble_service.stop_service()
+           logger.info(f'Keyboard exit')
+    else:
+       logger.info(f'Bluetooth Low Energy service for piaware configuration is disabled in piaware-config')
+       sys.exit(0)
 
 if __name__ == '__main__':
     main()

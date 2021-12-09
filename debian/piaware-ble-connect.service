@@ -7,9 +7,10 @@ Requires=bluetooth.target
 
 [Service]
 User=piaware-ble-connect
+ExecStartPre=/bin/sleep 10
 ExecStart=/usr/bin/python3 /usr/lib/piaware-ble-connect/piaware_ble_connect.py
 Type=simple
-Restart=always
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
