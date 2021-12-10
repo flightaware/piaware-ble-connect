@@ -87,6 +87,9 @@ def handle_request(host, port, request):
     # Generate piaware-configurator URL to send POST request to
     piaware_configurator_host_url = f'http://{host}:{port}/configurator'
 
+    # Tag request showing it came in via BLE
+    json_object['requestor'] = "piaware-ble-connect"
+
     response = http_json_post(piaware_configurator_host_url, json_object)
 
     return response
@@ -129,10 +132,10 @@ def advertising_should_be_on(piaware_configurator_url):
 
 
 def ble_enabled(piaware_configurator_url):
-    ''' Returns whether BLE service is enabled
+    ''' Returns whether BLE service should be active
 
     '''
-    request = '{"request": "piaware_config_read", "request_payload": ["enable-ble-config"]}'
+    request = '{"request": "piaware_config_read", "request_payload": ["allow-ble-setup", "wireless-ssid"]}'
     response = http_json_post(piaware_configurator_url, json.loads(request))
 
     # Something went wrong determining if BLE is enabled. Let's disable it
@@ -140,8 +143,14 @@ def ble_enabled(piaware_configurator_url):
        return False
 
     try:
-       ble_enabled = response['response_payload']['enable-ble-config']
-       return True if int(ble_enabled) == 1 else False
+       settings = response['response_payload']
+       allow_ble_setup = settings['allow-ble-setup']
+       wireless_ssid = settings['wireless-ssid']
+
+       # Enable Bluetooth Setup if one of the following:
+       #   1 - allow_ble_setup is set to yes (meaning wifi was configured over BLE before or this user explicitly set it)
+       #   2 - allow_ble_setup is set to auto and wireless-ssid is the default ssid in piaware-config.txt (meaning this is an initial setup)
+       return True if allow_ble_setup == "yes" or (allow_ble_setup == "auto" and wireless_ssid == "MyWifiNetwork") else False
 
     except KeyError:
        logger.info(f'Could not determine if BLE configuration is enabled')
