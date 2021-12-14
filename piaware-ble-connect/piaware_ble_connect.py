@@ -396,7 +396,7 @@ def main():
            ble_service.stop_service()
            logger.info(f'Keyboard exit')
     else:
-       logger.info(f'Bluetooth Low Energy service for piaware configuration is disabled in piaware-config')
+       logger.info(f'Shutting down PiAware Bluetooth service.')
        sys.exit(0)
 
 if __name__ == '__main__':

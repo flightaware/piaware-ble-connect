@@ -5,6 +5,7 @@ requests to piaware_configurator to configure piaware
 import json
 import requests
 import logging
+import time
 from piaware_helpers import get_rpi_model_and_serial_number
 
 logger = logging.getLogger('piaware_ble_connect')
@@ -136,23 +137,42 @@ def ble_enabled(piaware_configurator_url):
 
     '''
     request = '{"request": "piaware_config_read", "request_payload": ["allow-ble-setup", "wireless-ssid"]}'
-    response = http_json_post(piaware_configurator_url, json.loads(request))
+    max_retries = 5
 
-    # Something went wrong determining if BLE is enabled. Let's disable it
-    if response is None or type(response) is not dict:
-       return False
+    # Retry requests to piaware-configurator in case it's not ready to serve requests
+    for i in range(max_retries):
+        response = http_json_post(piaware_configurator_url, json.loads(request))
+        # Something went wrong determining if BLE is enabled. Let's disable it
+        if response is None or type(response) is not dict:
+           return False
+
+        if "success" in response and response["success"] == True:
+           break
+
+        logger.info(f'Could not connect to piaware-configurator...retrying...')
+        time.sleep(3)
+    else:
+        logger.error(f'Could not determine if BLE configuration should be enabled.')
+        return False
 
     try:
        settings = response['response_payload']
        allow_ble_setup = settings['allow-ble-setup']
        wireless_ssid = settings['wireless-ssid']
 
-       # Enable Bluetooth Setup if one of the following:
-       #   1 - allow_ble_setup is set to yes (meaning wifi was configured over BLE before or this user explicitly set it)
-       #   2 - allow_ble_setup is set to auto and wireless-ssid is the default ssid in piaware-config.txt (meaning this is an initial setup)
-       return True if allow_ble_setup == "yes" or (allow_ble_setup == "auto" and wireless_ssid == "MyWifiNetwork") else False
+       # Disable Bluetooth Setup if one of the following:
+       #   1 - allow_ble_setup is set to no (user explicitly disabled it)
+       #   2 - allow_ble_setup is set to auto and wireless-ssid has been set (user configured wifi by other means)
+       if allow_ble_setup == "no":
+           logger.info(f'PiAware Bluetooth service is disabled in your piaware-config settings')
+           return False
+       elif (allow_ble_setup == "auto" and not wireless_ssid == "MyWifiNetwork"):
+           logger.info(f'WiFi was already configured by other methods. Continue to use that method.')
+           return False
+       else:
+           return True
 
     except KeyError:
-       logger.info(f'Could not determine if BLE configuration is enabled')
+       logger.info(f'Could not determine if BLE configuration should be enabled')
 
     return False
