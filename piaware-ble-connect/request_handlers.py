@@ -133,7 +133,7 @@ def advertising_should_be_on(piaware_configurator_url):
 
 
 def ble_enabled(piaware_configurator_url):
-    ''' Returns whether BLE service should be active
+    ''' Returns whether BLE service is enabled in piaware-config
 
     '''
     request = '{"request": "piaware_config_read", "request_payload": ["allow-ble-setup", "wireless-ssid"]}'
@@ -146,13 +146,13 @@ def ble_enabled(piaware_configurator_url):
         if response is None or type(response) is not dict:
            return False
 
-        if "success" in response and response["success"] == True:
+        if response.get("success") == True:
            break
 
-        logger.info(f'Could not connect to piaware-configurator...retrying...')
+        logger.error(f'Error making request to piaware-configurator...retrying...')
         time.sleep(3)
     else:
-        logger.error(f'Could not determine if BLE configuration should be enabled.')
+        logger.error(f'Could not read piaware-config settings to determine if Bluetooth configuration should be enabled.')
         return False
 
     try:
@@ -172,7 +172,7 @@ def ble_enabled(piaware_configurator_url):
        else:
            return True
 
-    except KeyError:
-       logger.info(f'Could not determine if BLE configuration should be enabled')
+    except KeyError as e:
+       logger.error(f'Could not read {e} to determine if Bluetooth configuration should be enabled.')
 
     return False
