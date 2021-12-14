@@ -339,7 +339,7 @@ class BLE_Service():
         ''' Separate thread to auto-detect whether advertising mode should be enabled or disabled
 
         '''
-        ble_timeout_minutes = 5
+        ble_timeout_minutes = 8
         # Initial 1 minute delay after startup
         time.sleep(60)
         logger.info(f'Starting BLE discovery mode monitor')
