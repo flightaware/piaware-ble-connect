@@ -47,7 +47,7 @@ class TxCharacteristic(Characteristic):
         for c in s_bytes:
             value.append(dbus.Byte(c.encode('utf-8')))
             # If payload exceeds MTU, send it in pieces
-            if len(value) >= 182:
+            if len(value) >= 20:
                 self.PropertiesChanged(constants.GATT_CHRC_IFACE, {'Value': value}, [])
                 value.clear()
 
