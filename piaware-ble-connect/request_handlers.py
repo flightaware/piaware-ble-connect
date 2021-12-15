@@ -107,6 +107,28 @@ def get_ble_advertisement_identifier(BLE_host, BLE_port):
 
     return f"PiAware - {raspberry_pi_model}"
 
+def is_ethernet_active(piaware_configurator_url):
+    ''' Returns whether Ethernet is connected
+
+        Parameters:
+        piaware_configurator_url (str): URL of piaware-configurator to request receiver data from
+    '''
+    request = '{"request": "get_device_state"}'
+    response = http_json_post(piaware_configurator_url, json.loads(request))
+    if response is None or type(response) is not dict:
+        return None
+
+    try:
+        is_connected_to_internet = response['response_payload']['is_connected_to_internet']
+        network_interface = response['response_payload']['network_interface']
+
+        return True if is_connected_to_internet and network_interface == "eth0" else False
+
+    except KeyError:
+        logger.info(f'Could not determine Ethernet state')
+
+    return False
+
 
 def advertising_should_be_on(piaware_configurator_url):
     ''' Returns whether BLE peripheral should be in an advertising state.
@@ -124,6 +146,7 @@ def advertising_should_be_on(piaware_configurator_url):
     try:
         is_connected_to_internet = response['response_payload']['is_connected_to_internet']
         is_receiver_claimed = response['response_payload']['is_receiver_claimed']
+
         return False if is_connected_to_internet and is_receiver_claimed else True
 
     except KeyError:

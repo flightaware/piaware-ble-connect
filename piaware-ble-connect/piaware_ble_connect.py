@@ -13,7 +13,7 @@ import sys, os
 import constants
 from bluez import Application, Advertisement, Service, Characteristic
 from bluez import find_adapter
-from request_handlers import handle_request, get_ble_advertisement_identifier, advertising_should_be_on, ble_enabled
+from request_handlers import handle_request, get_ble_advertisement_identifier, advertising_should_be_on, ble_enabled, is_ethernet_active
 
 UART_SERVICE_UUID = 'ac8602af-0226-4889-b925-d751bdf70001'
 UART_RX_CHARACTERISTIC_UUID = 'ac8602af-0226-4889-b925-d751bdf70002'
@@ -343,6 +343,11 @@ class BLE_Service():
         # Initial 1 minute delay after startup
         time.sleep(60)
         logger.info(f'Starting BLE discovery mode monitor')
+
+        if is_ethernet_active(self.piaware_configurator_url):
+            logger.info(f'Ethernet is connected. PiAware Bluetooth service is not needed')
+            self.stop_service()
+
         while True:
             # BLE advertising timeout reached. Shutdown BLE service
             if ble_timeout_minutes == 0:
