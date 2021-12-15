@@ -348,6 +348,7 @@ class BLE_Service():
             logger.info(f'Ethernet is connected. PiAware Bluetooth service is not needed')
             self.stop_service()
 
+        advertising_blocked = False
         while True:
             # BLE advertising timeout reached. Shutdown BLE service
             if ble_timeout_minutes == 0:
@@ -370,8 +371,12 @@ class BLE_Service():
 
             # Advertising OFF and should be ON. Enable BLE advertising
             elif is_advertising == False and should_advertising_be_on == True:
-                logger.info(f'PiAware is not connected to FlightAware and/or unclaimed. Enabling PiAware Bluetooth discovery mode.')
-                self.ble_peripheral.start_advertising()
+                # Never re-enable advertising for security purposes. Reboot is required
+                if not advertising_blocked:
+                    logger.info(f'PiAware is not connected to FlightAware and/or unclaimed. Enabling PiAware Bluetooth discovery mode.')
+                    self.ble_peripheral.start_advertising()
+                    advertising_blocked = True
+                pass
 
             time.sleep(60)
             ble_timeout_minutes -= 1
