@@ -326,7 +326,7 @@ class BLE_Service():
         self.advertising_monitor = None
 
     def start_service(self):
-        logger.info(f'Starting Bluetooth Low Energy service for piaware configuration')
+        logger.info(f'Starting Bluetooth LE service for PiAware configuration')
         self.ble_peripheral = BLE_Peripheral()
         self.ble_peripheral.register_application()
 
@@ -339,16 +339,22 @@ class BLE_Service():
         ''' Separate thread to auto-detect whether advertising mode should be enabled or disabled
 
         '''
-        ble_timeout_minutes = 15
-        # Initial 1 minute delay after startup
+        # 1 minute buffer to make sure everything is up
+        logger.info(f'Making sure everything is up before enabling Bluetooth LE Advertising...')
         time.sleep(60)
-        logger.info(f'Starting BLE discovery mode monitor')
+
+        ble_timeout_minutes = 5
+
+        logger.info(f'Starting BLE Advertising Mode monitor')
 
         if is_ethernet_active(self.piaware_configurator_url):
             logger.info(f'Ethernet is connected. PiAware Bluetooth service is not needed')
             self.stop_service()
 
         advertising_blocked = False
+        current_advertising_state = "on" if self.ble_peripheral.is_advertising else "off"
+        logger.info(f'PiAware Bluetooth advertising is currently {current_advertising_state}')
+
         while True:
             # BLE advertising timeout reached. Shutdown BLE service
             if ble_timeout_minutes == 0:
@@ -373,7 +379,7 @@ class BLE_Service():
             elif is_advertising == False and should_advertising_be_on == True:
                 # Never re-enable advertising for security purposes. Reboot is required
                 if not advertising_blocked:
-                    logger.info(f'PiAware is not connected to FlightAware and/or unclaimed. Enabling PiAware Bluetooth discovery mode.')
+                    logger.info(f'PiAware is not connected to FlightAware and/or unclaimed. Enabling Bluetooth LE advertising mode.')
                     self.ble_peripheral.start_advertising()
                     advertising_blocked = True
                 pass
