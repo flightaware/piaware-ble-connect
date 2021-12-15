@@ -183,6 +183,10 @@ def ble_enabled(piaware_configurator_url):
        allow_ble_setup = settings['allow-ble-setup']
        wireless_ssid = settings['wireless-ssid']
 
+       if allow_ble_setup not in ["auto", "yes", "no"]:
+           logger.info('Unrecognized piaware-config setting for allow-ble-setup')
+           return False
+
        # Disable Bluetooth Setup if one of the following:
        #   1 - allow_ble_setup is set to no (user explicitly disabled it)
        #   2 - allow_ble_setup is set to auto and wireless-ssid has been set (user configured wifi by other means)
