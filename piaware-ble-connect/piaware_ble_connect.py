@@ -343,7 +343,7 @@ class BLE_Service():
         logger.info(f'Making sure everything is up before enabling Bluetooth LE Advertising...')
         time.sleep(60)
 
-        ble_timeout_minutes = 5
+        ble_timeout_minutes = 15
 
         logger.info(f'Starting BLE Advertising Mode monitor')
 
