@@ -1,6 +1,18 @@
 # BlueZ DBus Service Name
 BLUEZ_SERVICE_NAME = 'org.bluez'
 
+# Dbus Systemd Interface
+DBUS_SYSTEMD_IFACE = 'org.freedesktop.systemd1'
+
+# Dbus Systemd Object Path
+DBUS_SYSTEMD_OBJECT_PATH = '/org/freedesktop/systemd1'
+
+# Dbus Systemd Manager Interface
+DBUS_SYSTEMD_MANAGER_IFACE = 'org.freedesktop.systemd1.Manager'
+
+# Dbus Systemd Unit InterfacE
+DBUS_SYSTEMD_UNIT_IFCE = 'org.freedesktop.systemd1.Unit'
+
 # DBus Object Manager interface
 DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
 
