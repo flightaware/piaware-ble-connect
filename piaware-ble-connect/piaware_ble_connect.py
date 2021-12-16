@@ -14,6 +14,7 @@ import constants
 from bluez import Application, Advertisement, Service, Characteristic
 from bluez import find_adapter
 from request_handlers import handle_request, get_ble_advertisement_identifier, advertising_should_be_on, ble_enabled, is_ethernet_active
+from dbus_helpers import shutdown_ble_services
 
 UART_SERVICE_UUID = 'ac8602af-0226-4889-b925-d751bdf70001'
 UART_RX_CHARACTERISTIC_UUID = 'ac8602af-0226-4889-b925-d751bdf70002'
@@ -389,9 +390,9 @@ class BLE_Service():
 
 
     def stop_service(self):
-        logger.info(f'Stopping Bluetooth Low Energy service for piaware configuration')
         self.ble_peripheral.unregister_application()
-        os._exit(0)
+        shutdown_ble_services()
+
 
 def main():
     global BLE_host
@@ -404,16 +405,17 @@ def main():
     BLE_port = args.port
     piaware_configurator_url = f'http://{BLE_host}:{BLE_port}/configurator'
 
+    # Check config settings to see if service should be started
     if ble_enabled(piaware_configurator_url):
-       ble_service = BLE_Service(piaware_configurator_url)
-       try:
-           ble_service.start_service()
-       except KeyboardInterrupt:
-           ble_service.stop_service()
-           logger.info(f'Keyboard exit')
+        try:
+            ble_service = BLE_Service(piaware_configurator_url)
+            ble_service.start_service()
+        except KeyboardInterrupt:
+            ble_service.stop_service()
+            logger.info(f'Keyboard exit')
     else:
-       logger.info(f'Shutting down PiAware Bluetooth service.')
-       sys.exit(0)
+        shutdown_ble_services()
+        sys.exit(0)
 
 if __name__ == '__main__':
     main()
