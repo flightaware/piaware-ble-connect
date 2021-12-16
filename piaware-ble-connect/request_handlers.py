@@ -172,7 +172,7 @@ def ble_enabled(piaware_configurator_url):
         if response.get("success") == True:
            break
 
-        logger.error(f'Error making request to piaware-configurator...retrying...')
+        logger.debug(f'Error making request to piaware-configurator...retrying...')
         time.sleep(3)
     else:
         logger.error(f'Could not read piaware-config settings to determine if Bluetooth configuration should be enabled.')
