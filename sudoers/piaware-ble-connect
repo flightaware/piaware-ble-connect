@@ -4,3 +4,7 @@ piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl stop piaware-wifi-scan.se
 piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl stop piaware-configurator.service
 
 piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl stop piaware-ble-connect.service
+
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl start piaware-wifi-scan.service
+
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl start piaware-configurator.service

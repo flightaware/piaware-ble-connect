@@ -14,7 +14,7 @@ import constants
 from bluez import Application, Advertisement, Service, Characteristic
 from bluez import find_adapter
 from request_handlers import handle_request, get_ble_advertisement_identifier, advertising_should_be_on, ble_enabled, is_ethernet_active
-from dbus_helpers import shutdown_ble_services
+from dbus_helpers import shutdown_ble_services, start_piaware_configurator, start_piaware_wifi_scan
 
 UART_SERVICE_UUID = 'ac8602af-0226-4889-b925-d751bdf70001'
 UART_RX_CHARACTERISTIC_UUID = 'ac8602af-0226-4889-b925-d751bdf70002'
@@ -405,14 +405,22 @@ def main():
     BLE_port = args.port
     piaware_configurator_url = f'http://{BLE_host}:{BLE_port}/configurator'
 
-    # Check config settings to see if service should be started
+    # Start piaware-configurator to determine if should start Bluetooth service
+    start_piaware_configurator()
+
+    # Check piaware-config setting
     if ble_enabled(piaware_configurator_url):
         try:
+            start_piaware_wifi_scan()
             ble_service = BLE_Service(piaware_configurator_url)
             ble_service.start_service()
         except KeyboardInterrupt:
             ble_service.stop_service()
             logger.info(f'Keyboard exit')
+        except Exception:
+            logger.info(f'Something went wrong...')
+            shutdown_ble_services()
+            sys.exit(0)
     else:
         shutdown_ble_services()
         sys.exit(0)
