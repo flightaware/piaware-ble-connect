@@ -8,7 +8,7 @@ After=piaware-configurator.service
 
 [Service]
 User=piaware-ble-connect
-ExecStart=/usr/bin/python3 /usr/lib/piaware-ble-connect/piaware_ble_connect.py
+ExecStart=/usr/lib/piaware-ble-connect/piaware_ble_connect
 Type=simple
 Restart=on-failure
 
