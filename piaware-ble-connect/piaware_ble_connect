@@ -351,6 +351,7 @@ class BLE_Service():
         if is_ethernet_active(self.piaware_configurator_url):
             logger.info(f'Ethernet is connected. PiAware Bluetooth service is not needed')
             self.stop_service()
+            return
 
         advertising_blocked = False
         current_advertising_state = "on" if self.ble_peripheral.is_advertising else "off"
@@ -362,6 +363,7 @@ class BLE_Service():
                 logger.info(f'Bluetooth discovery enabled timeout reached. Shutting down PiAware Bluetooth service.')
                 self.ble_peripheral.stop_advertising()
                 self.stop_service()
+                return
 
             is_advertising = self.ble_peripheral.is_advertising
             should_advertising_be_on = advertising_should_be_on(self.piaware_configurator_url)
