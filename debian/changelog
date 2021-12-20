@@ -1,5 +1,7 @@
-piaware-ble-connect (7.0~dev) UNRELEASED; urgency=medium
+piaware-ble-connect (7.0) UNRELEASED; urgency=medium
 
-  * In development
+  * First release of Bluetooth Low Energy (BLE) service for PiAware
+  * Implements a UART service to handle requests from FlightAware BLE central
+    applications to configure PiAware WiFi over Bluetooth LE
 
- -- Eric Tran <eric.tran@flightaware.com>  Tue, 07 Dec 2021 13:46:33 -0600
+ -- Eric Tran <eric.tran@flightaware.com>  Mon, 20 Dec 2021 12:20:33 -0600
