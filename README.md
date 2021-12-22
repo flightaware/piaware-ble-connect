@@ -8,7 +8,11 @@ PiAware is unclaimed. If these two conditions are met, BLE discovery is disabled
 
 - piaware-ble-connect will remain active for a maximum of 15 minutes before shutting down. You must reboot to re-enable the BLE services.
 
-- To disable BLE setup completely, you can set the “allow-ble-setup” piaware-config setting to “no” and reboot.
+- To disable BLE setup completely, you can set the `allow-ble-setup` piaware-config setting to `no` and reboot.
+
+- BLE setup is disabled automatically if PiAware is connected to Ethernet
+
+- BLE setup is disabled automatically if you've configured WiFi manually (i.e. via piaware-config). The idea is if you configured it manually before, you should be able to configure it again. You can override this behavior by setting `allow-ble-setup` to `yes` to enable BLE setup when needed.
 
 
 ## allow-ble-setup
