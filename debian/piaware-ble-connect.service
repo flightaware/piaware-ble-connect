@@ -4,12 +4,13 @@
 Description=Bluetooth LE service for configuring PiAware
 After=bluetooth.target
 Requires=bluetooth.target
+After=piaware-configurator.service
 
 [Service]
 User=piaware-ble-connect
-ExecStart=/usr/bin/python3 /usr/lib/piaware-ble-connect/piaware_ble_connect.py
+ExecStart=/usr/lib/piaware-ble-connect/piaware_ble_connect
 Type=simple
-Restart=always
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target

@@ -2,7 +2,9 @@
 
 They are taken from the Bluez example-advertisement.py and example-gatt-server.py scripts
 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/
+https://github.com/bluez/bluez/tree/master/test
+
+SPDX-License-Identifier: LGPL-2.1-or-later
 '''
 import dbus
 import dbus.service

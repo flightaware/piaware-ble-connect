@@ -1,0 +1,12 @@
+# This file enables sudo access to allow piaware-ble-connect to shutdown ONLY its related services
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl stop piaware-wifi-scan.service
+
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl stop piaware-configurator.service
+
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl stop piaware-ble-connect.service
+
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl start piaware-wifi-scan.service
+
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl start piaware-configurator.service
+
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl restart piaware-configurator.service

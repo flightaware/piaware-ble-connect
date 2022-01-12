@@ -1,1 +1,3 @@
 piaware-ble-connect/ /usr/lib/
+systemd/* lib/systemd/system/
+sudoers/piaware-ble-connect /etc/sudoers.d/

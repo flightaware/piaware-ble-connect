@@ -10,10 +10,11 @@ def get_rpi_model_and_serial_number():
     """
     rpi_model_mapping = {
                          "RPi Zero W": ["9000c1"],
+                         "RPi Zero 2 W": ["902120"],
                          "RPi Zero": ["900092", "900093", "920093"],
                          "RPi 3B": ["a02082", "a22082", "a32082"],
                          "RPi 3B+": ["a020d3"],
-                         "RPi 4": ["a03111", "b03111", "c03111"]
+                         "RPi 4": ["a03111", "b03111", "c03111", "c03112", "c03114", "d03114"]
                         }
 
     pi_model = "Raspberry Pi"

@@ -5,7 +5,8 @@ requests to piaware_configurator to configure piaware
 import json
 import requests
 import logging
-from piaware_helpers import get_rpi_model_and_serial_number, get_adsb_site_number
+import time
+from piaware_helpers import get_rpi_model_and_serial_number
 
 logger = logging.getLogger('piaware_ble_connect')
 
@@ -29,7 +30,7 @@ def http_json_post(url, json_body):
         Returns: JSON response
 
     """
-    request_id = json_body["request_id"]
+    request_id = json_body.get("request_id")
     try:
         r = requests.post(url, json=json_body, timeout=20)
         r.raise_for_status()  # Raises a HTTPError if the status is 4xx, 5xxx
@@ -87,6 +88,9 @@ def handle_request(host, port, request):
     # Generate piaware-configurator URL to send POST request to
     piaware_configurator_host_url = f'http://{host}:{port}/configurator'
 
+    # Tag request showing it came in via BLE
+    json_object['requestor'] = "piaware-ble-connect"
+
     response = http_json_post(piaware_configurator_host_url, json_object)
 
     return response
@@ -94,46 +98,37 @@ def handle_request(host, port, request):
 
 def get_ble_advertisement_identifier(BLE_host, BLE_port):
     """ Returns an identifier name to use when advertising over BLE.
-        Name priority: custom name, site number, Rpi model
 
         Parameters:
         host (str): Host IP of piaware-configurator serving BLE requests
         port (str): Port number of piaware-configurator serving BLE requests
     """
     raspberry_pi_model, serial_number = get_rpi_model_and_serial_number()
-    site_number = get_adsb_site_number()
-    #custom_name = get_custom_name(BLE_host, BLE_port)
-
-    #if custom_name:
-    #    return f"PiAware - {custom_name}"
-
-    if site_number:
-        return f"PiAware - Site {site_number}"
 
     return f"PiAware - {raspberry_pi_model}"
 
-def get_custom_name(BLE_host, BLE_port):
-    """ Returns custom-name piaware-config value if set
+def is_ethernet_active(piaware_configurator_url):
+    ''' Returns whether Ethernet is connected
 
         Parameters:
-        host (str): Host IP of piaware-configurator serving BLE requests
-        port (str): Port number of piaware-configurator serving BLE requests
-    """
-    custom_name = None
-
-    # Get custom-name config setting
-    request = '{"request_id": 12345, "request": "piaware_config_read", "request_payload": ["custom-name"]}'
-    response = handle_request(BLE_host, BLE_port, request)
+        piaware_configurator_url (str): URL of piaware-configurator to request receiver data from
+    '''
+    request = '{"request": "get_device_state"}'
+    response = http_json_post(piaware_configurator_url, json.loads(request))
     if response is None or type(response) is not dict:
         return None
 
-    # Extract custom-name
     try:
-        custom_name = response["response_payload"]["custom-name"]
-    except KeyError:
-        return None
+        is_connected_to_internet = response['response_payload']['is_connected_to_internet']
+        network_interface = response['response_payload']['network_interface']
 
-    return custom_name
+        return True if is_connected_to_internet and network_interface == "eth0" else False
+
+    except KeyError:
+        logger.info(f'Could not determine Ethernet state')
+
+    return False
+
 
 def advertising_should_be_on(piaware_configurator_url):
     ''' Returns whether BLE peripheral should be in an advertising state.
@@ -143,7 +138,7 @@ def advertising_should_be_on(piaware_configurator_url):
         Parameters:
         piaware_configurator_url (str): URL of piaware-configurator to request receiver data from
     '''
-    request = '{"request_id": 12345, "request": "get_device_state"}'
+    request = '{"request": "get_device_state"}'
     response = http_json_post(piaware_configurator_url, json.loads(request))
     if response is None or type(response) is not dict:
         return None
@@ -151,9 +146,60 @@ def advertising_should_be_on(piaware_configurator_url):
     try:
         is_connected_to_internet = response['response_payload']['is_connected_to_internet']
         is_receiver_claimed = response['response_payload']['is_receiver_claimed']
+
         return False if is_connected_to_internet and is_receiver_claimed else True
 
     except KeyError:
         logger.info(f'Could not determine if advertising should be on')
 
     return True
+
+
+def ble_enabled(piaware_configurator_url):
+    ''' Returns whether BLE service is enabled in piaware-config
+
+    '''
+    request = '{"request": "piaware_config_read", "request_payload": ["allow-ble-setup", "wireless-ssid"]}'
+    max_retries = 5
+
+    # Retry requests to piaware-configurator in case it's not ready to serve requests
+    for i in range(max_retries):
+        response = http_json_post(piaware_configurator_url, json.loads(request))
+        # Something went wrong determining if BLE is enabled. Let's disable it
+        if response is None or type(response) is not dict:
+           return False
+
+        if response.get("success") == True:
+           break
+
+        logger.debug(f'Error making request to piaware-configurator...retrying...')
+        time.sleep(6)
+    else:
+        logger.error(f'Could not read piaware-config settings to determine if Bluetooth configuration should be enabled.')
+        return False
+
+    try:
+       settings = response['response_payload']
+       allow_ble_setup = settings['allow-ble-setup']
+       wireless_ssid = settings['wireless-ssid']
+
+       if allow_ble_setup not in ["auto", "yes", "no"]:
+           logger.info('Unrecognized piaware-config setting for allow-ble-setup')
+           return False
+
+       # Disable Bluetooth Setup if one of the following:
+       #   1 - allow_ble_setup is set to no (user explicitly disabled it)
+       #   2 - allow_ble_setup is set to auto and wireless-ssid has been set (user configured wifi by other means)
+       if allow_ble_setup == "no":
+           logger.info(f'PiAware Bluetooth service is disabled in your piaware-config settings')
+           return False
+       elif (allow_ble_setup == "auto" and not wireless_ssid == "MyWifiNetwork"):
+           logger.info(f'WiFi was already configured by other methods. Continue to use that method.')
+           return False
+       else:
+           return True
+
+    except KeyError as e:
+       logger.error(f'Could not read {e} to determine if Bluetooth configuration should be enabled.')
+
+    return False
