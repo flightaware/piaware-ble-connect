@@ -269,6 +269,9 @@ class BLE_Peripheral():
         self.ad_manager.RegisterAdvertisement(self.advertisement.get_path(), {},
                                                 reply_handler=self.register_adv_callback,
                                                 error_handler=self.register_adv_error_callback)
+
+        os.system('echo timer | sudo tee /sys/class/leds/led0/trigger 1>/dev/null')
+
         self.is_advertising = True
 
     def stop_advertising(self):
@@ -287,6 +290,7 @@ class BLE_Peripheral():
         except dbus.exceptions.DBusException:
             logger.error(f'Error disabling BLE Peripheral advertising')
 
+        os.system('echo actpwr | sudo tee /sys/class/leds/led0/trigger 1>/dev/null')
         self.is_advertising = False
 
     def is_advertising(self):
