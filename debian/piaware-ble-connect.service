@@ -9,6 +9,7 @@ After=piaware-configurator.service
 [Service]
 User=piaware-ble-connect
 ExecStart=/usr/lib/piaware-ble-connect/piaware_ble_connect
+ExecStopPost=/usr/lib/piaware-ble-connect/restore_led
 Type=simple
 Restart=on-failure
 

@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import os
+
+cmd = "echo actpwr | sudo tee /sys/class/leds/led0/trigger 1>/dev/null
+os.system(cmd)
