@@ -15,6 +15,7 @@ from bluez import Application, Advertisement, Service, Characteristic
 from bluez import find_adapter
 from request_handlers import handle_request, get_ble_advertisement_identifier, advertising_should_be_on, ble_enabled, is_ethernet_active
 from services import shutdown_ble_services, restart_piaware_configurator, start_piaware_wifi_scan
+import led as led
 
 UART_SERVICE_UUID = 'ac8602af-0226-4889-b925-d751bdf70001'
 UART_RX_CHARACTERISTIC_UUID = 'ac8602af-0226-4889-b925-d751bdf70002'
@@ -270,7 +271,7 @@ class BLE_Peripheral():
                                                 reply_handler=self.register_adv_callback,
                                                 error_handler=self.register_adv_error_callback)
 
-        os.system('echo timer | sudo tee /sys/class/leds/led0/trigger 1>/dev/null')
+        led.blink('led0')
 
         self.is_advertising = True
 
@@ -290,7 +291,8 @@ class BLE_Peripheral():
         except dbus.exceptions.DBusException:
             logger.error(f'Error disabling BLE Peripheral advertising')
 
-        os.system('echo actpwr | sudo tee /sys/class/leds/led0/trigger 1>/dev/null')
+        led.restore_default('led0')
+
         self.is_advertising = False
 
     def is_advertising(self):
