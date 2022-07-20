@@ -25,6 +25,8 @@ def restore_default(led_num):
         'c03111': 'mmc0'    # Pi 4 3gb
     }
 
+    revision = None
+
     # Get cpu revision
     with open('/proc/cpuinfo', 'r') as f:
         cpuinfo = f.readlines()
@@ -34,7 +36,7 @@ def restore_default(led_num):
                 revision = fields[1].strip()
                 break
 
-    # Set trigger based on Pi's default
+    # Set trigger based on Pi's default. Default to mmc0 if we can't lookup revision
     if revision in default_triggers:
         trigger = default_triggers[revision]
     else:
