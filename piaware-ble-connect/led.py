@@ -44,7 +44,3 @@ def restore_default(led_num):
 
     cmd = f"echo {trigger} | sudo tee /sys/class/leds/{led_num}/trigger 1>/dev/null"
     os.system(cmd)
-
-
-if __name__ == '__main__':
-   restore_default('led0')

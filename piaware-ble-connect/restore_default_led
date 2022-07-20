@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+
+import led
+
+led.restore_default('led0')
