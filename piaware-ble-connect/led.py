@@ -8,7 +8,7 @@ import subprocess
 logger = logging.getLogger('piaware_ble_connect')
 
 def blink(led_num):
-    logger.debug(f'Setting sysfs {led_num} trigger: trigger')
+    logger.info(f'Setting sysfs {led_num} trigger: trigger')
 
     subprocess.run(['sudo', 'tee', f'/sys/class/leds/{led_num}/trigger'], text=True, input="timer\n", stdout=subprocess.DEVNULL, check=True)
 
@@ -21,6 +21,6 @@ def restore_default(led_num):
         # Fallback to mmc0 if we can't read the file for some reason
         trigger = 'mmc0'
 
-    logger.debug(f'Setting sysfs {led_num} trigger: {trigger}')
+    logger.info(f'Setting sysfs {led_num} trigger: {trigger}')
 
     subprocess.run(['sudo', 'tee', f'/sys/class/leds/{led_num}/trigger'], text=True, input=f'{trigger}\n', stdout=subprocess.DEVNULL, check=True)
