@@ -8,6 +8,7 @@ import logging
 import argparse
 from threading import Thread
 import time
+from subprocess import CalledProcessError
 import sys, os
 
 import constants
@@ -271,7 +272,10 @@ class BLE_Peripheral():
                                                 reply_handler=self.register_adv_callback,
                                                 error_handler=self.register_adv_error_callback)
 
-        led.blink('led0')
+        try:
+            led.blink('led0')
+        except CalledProcessError:
+            logger.error('Unable to configure LED to blink')
 
         self.is_advertising = True
 
@@ -291,7 +295,10 @@ class BLE_Peripheral():
         except dbus.exceptions.DBusException:
             logger.error(f'Error disabling BLE Peripheral advertising')
 
-        led.restore_default('led0')
+        try:
+            led.restore_default('led0')
+        except CalledProcessError:
+            logger.error('Error restoring the default LED trigger')
 
         self.is_advertising = False
 

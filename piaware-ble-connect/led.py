@@ -2,12 +2,15 @@
 
 # Helper functions to control LEDs on the Pi
 
-import os
+import logging
+import subprocess
+
+logger = logging.getLogger('piaware_ble_connect')
 
 def blink(led_num):
-    cmd = f"echo timer | sudo tee /sys/class/leds/{led_num}/trigger 1>/dev/null"
-    os.system(cmd)
+    logger.debug(f'Setting sysfs {led_num} trigger: trigger')
 
+    subprocess.run(['sudo', 'tee', f'/sys/class/leds/{led_num}/trigger'], text=True, input="timer\n", stdout=subprocess.DEVNULL, check=True)
 
 # Read default trigger saved in /run/ directory
 def restore_default(led_num):
@@ -15,8 +18,9 @@ def restore_default(led_num):
         with open('/run/piaware-ble-connect/trigger', 'r') as f:
             trigger = f.read()
     except FileNotFoundError as e:
-        # Default to mmc0 if we can't read the file
+        # Fallback to mmc0 if we can't read the file for some reason
         trigger = 'mmc0'
 
-    cmd = f"echo {trigger} | sudo tee /sys/class/leds/{led_num}/trigger 1>/dev/null"
-    os.system(cmd)
+    logger.debug(f'Setting sysfs {led_num} trigger: {trigger}')
+
+    subprocess.run(['sudo', 'tee', f'/sys/class/leds/{led_num}/trigger'], text=True, input=f'{trigger}\n', stdout=subprocess.DEVNULL, check=True)
