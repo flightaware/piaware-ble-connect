@@ -196,7 +196,10 @@ class BLE_Peripheral():
             logger.critical('BLE adapter not found')
             return
 
-        self.ethernet_present = True if glob('/sys/class/net/eth*') or glob('/sys/class/net/en*') else False
+        # Check if any ethernet interfaces exist in /sys/class/net
+        ethernet_interfaces = glob('/sys/class/net/eth*')
+        ethernet_interfaces.extend(glob('/sys/class/net/en*'))
+        self.ethernet_present = True if ethernet_interfaces else False
 
         # Create a GATT Manager dbus.Interface object
         self.service_manager = dbus.Interface(
