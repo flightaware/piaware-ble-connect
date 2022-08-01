@@ -3,6 +3,7 @@
 import dbus
 import dbus.mainloop.glib
 from gi.repository import GLib
+from glob import glob
 import json
 import logging
 import argparse
@@ -195,6 +196,8 @@ class BLE_Peripheral():
             logger.critical('BLE adapter not found')
             return
 
+        self.ethernet_present = True if glob('/sys/class/net/eth*') or glob('/sys/class/net/en*') else False
+
         # Create a GATT Manager dbus.Interface object
         self.service_manager = dbus.Interface(
                                     self.bus.get_object(constants.BLUEZ_SERVICE_NAME, self.adapter),
@@ -353,9 +356,12 @@ class BLE_Service():
         ''' Separate thread to auto-detect whether advertising mode should be enabled or disabled
 
         '''
-        # 1 minute buffer to make sure everything is up
-        logger.info(f'Making sure everything is up before enabling Bluetooth LE Advertising...')
-        time.sleep(60)
+        # If ethernet interface is present, wait a minute to give everything time to connect
+        if self.ble_peripheral.ethernet_present:
+            logger.info(f'Making sure everything is up before enabling Bluetooth LE Advertising...')
+            time.sleep(60)
+        else:
+            logger.info(f'No ethernet interface present')
 
         ble_timeout_minutes = 15
 
