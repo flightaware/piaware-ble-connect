@@ -8,6 +8,7 @@ import logging
 import argparse
 from threading import Thread
 import time
+from subprocess import CalledProcessError
 import sys, os
 
 import constants
@@ -15,6 +16,7 @@ from bluez import Application, Advertisement, Service, Characteristic
 from bluez import find_adapter
 from request_handlers import handle_request, get_ble_advertisement_identifier, advertising_should_be_on, ble_enabled, is_ethernet_active
 from services import shutdown_ble_services, restart_piaware_configurator, start_piaware_wifi_scan
+import led as led
 
 UART_SERVICE_UUID = 'ac8602af-0226-4889-b925-d751bdf70001'
 UART_RX_CHARACTERISTIC_UUID = 'ac8602af-0226-4889-b925-d751bdf70002'
@@ -269,6 +271,12 @@ class BLE_Peripheral():
         self.ad_manager.RegisterAdvertisement(self.advertisement.get_path(), {},
                                                 reply_handler=self.register_adv_callback,
                                                 error_handler=self.register_adv_error_callback)
+
+        try:
+            led.blink('led0')
+        except CalledProcessError:
+            logger.error('Unable to configure LED to blink')
+
         self.is_advertising = True
 
     def stop_advertising(self):
@@ -286,6 +294,11 @@ class BLE_Peripheral():
                                                   error_handler=self.unregister_adv_error_callback)
         except dbus.exceptions.DBusException:
             logger.error(f'Error disabling BLE Peripheral advertising')
+
+        try:
+            led.restore_default('led0')
+        except CalledProcessError:
+            logger.error('Error restoring the default LED trigger')
 
         self.is_advertising = False
 

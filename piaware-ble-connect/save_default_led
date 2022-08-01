@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Saves the default led0 trigger to /run/piaware-ble-connect/trigger
+
+triggerfile='/sys/class/leds/led0/trigger'
+
+trigger=$(awk -F '[][]' '{print $2}' $triggerfile)
+echo -n $trigger > '/run/piaware-ble-connect/trigger'
