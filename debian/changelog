@@ -1,8 +1,9 @@
-piaware-ble-connect (8.0) UNRELEASED; urgency=medium
+piaware-ble-connect (8.0) stable; urgency=medium
 
-  * No change release for 8.0
+  * Blink on-board LED when pairing mode is active
+  * Skip 1 minute startup delay if no Ethernet interface is present
 
- -- Eric Tran <eric.tran@flightaware.com>  Mon, 21 Nov 2022 10:48:28 -0600
+ -- Eric Tran <eric.tran@flightaware.com>  Tue, 06 Dec 2022 14:19:28 -0600
 
 piaware-ble-connect (7.2) stable; urgency=medium
 
