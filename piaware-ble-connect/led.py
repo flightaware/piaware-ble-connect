@@ -3,9 +3,17 @@
 # Helper functions to control LEDs on the Pi
 
 import logging
+import os
 import subprocess
 
 logger = logging.getLogger('piaware_ble_connect')
+
+def detect_led(candidates):
+    for candidate in candidates:
+        if os.path.exists(f'/sys/class/leds/{candidate}/trigger'):
+            return candidate
+
+    return None
 
 def blink(led_num):
     logger.info(f'Setting sysfs {led_num} trigger: trigger')
