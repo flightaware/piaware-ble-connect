@@ -2,4 +2,6 @@
 
 import led
 
-led.restore_default('led0')
+led_identifier = led.detect_led(['ACT', 'led0'])
+if led is not None:
+    led.restore_default(led_identifier)
