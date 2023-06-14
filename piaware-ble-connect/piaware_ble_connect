@@ -279,7 +279,7 @@ class BLE_Peripheral():
                                                 error_handler=self.register_adv_error_callback)
 
         try:
-            led_identifier = detect_led(['ACT', 'led0'])
+            led_identifier = led.detect_led(['ACT', 'led0'])
             if led_identifier is not None:
                 led.blink(led_identifier)
         except CalledProcessError:
@@ -304,7 +304,7 @@ class BLE_Peripheral():
             logger.error(f'Error disabling BLE Peripheral advertising')
 
         try:
-            led_identifier = detect_led(['ACT', 'led0'])
+            led_identifier = led.detect_led(['ACT', 'led0'])
             if led_identifier is not None:
                 led.restore_default(led_identifier)
         except CalledProcessError:
