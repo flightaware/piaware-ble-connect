@@ -103,9 +103,30 @@ def get_ble_advertisement_identifier(BLE_host, BLE_port):
         host (str): Host IP of piaware-configurator serving BLE requests
         port (str): Port number of piaware-configurator serving BLE requests
     """
-    raspberry_pi_model, serial_number = get_rpi_model_and_serial_number()
+    piaware_configurator_url = f'http://{BLE_host}:{BLE_port}/configurator'
 
-    return f"PiAware - {raspberry_pi_model}"
+    raspberry_pi_model, mfr_serial_number = get_rpi_model_and_serial_number()
+    request = '{"request": "get_device_info", "requestor":"piaware-ble-connect"}'
+    response = http_json_post(piaware_configurator_url, json.loads(request))
+    if response is None or type(response) is not dict:
+        return f"FlightAware Receiver - {raspberry_pi_model}"
+
+    try:
+        response_payload = response['response_payload']
+        image_type = response_payload['image_type']
+        if image_type.startswith('flightfeeder'):
+            ff_serial_number = response_payload.get('flightfeeder_serial')
+            if ff_serial_number:
+                return f"FlightFeeder - Serial #{ff_serial_number}"
+            else:
+                return "FlightFeeder - Serial N/A"
+        else:
+            return f"PiAware - {raspberry_pi_model}"
+
+    except KeyError:
+        logger.info(f'Could not determine image type')
+
+    return f"FlightAware Receiver - {raspberry_pi_model}"
 
 def is_ethernet_active(piaware_configurator_url):
     ''' Returns whether Ethernet is connected

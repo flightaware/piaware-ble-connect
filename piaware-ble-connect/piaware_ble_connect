@@ -445,8 +445,8 @@ def main():
         except KeyboardInterrupt:
             ble_service.stop_service()
             logger.info(f'Keyboard exit')
-        except Exception:
-            logger.info(f'Something went wrong...')
+        except Exception as e:
+            logger.info(f'Something went wrong...{e}')
             shutdown_ble_services()
             sys.exit(0)
     else:
