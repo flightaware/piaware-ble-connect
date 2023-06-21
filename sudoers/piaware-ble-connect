@@ -12,3 +12,5 @@ piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl start piaware-configurato
 piaware-ble-connect ALL = NOPASSWD: /usr/bin/systemctl restart piaware-configurator.service
 
 piaware-ble-connect ALL = NOPASSWD: /usr/bin/tee /sys/class/leds/led0/trigger
+
+piaware-ble-connect ALL = NOPASSWD: /usr/bin/tee /sys/class/leds/ACT/trigger
