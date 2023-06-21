@@ -366,7 +366,7 @@ class BLE_Service():
         # If ethernet interface is present, wait a minute to give everything time to connect
         if self.ble_peripheral.ethernet_present:
             logger.info(f'Making sure everything is up before enabling Bluetooth LE Advertising...')
-            time.sleep(60)
+            time.sleep(10)
         else:
             logger.info(f'No ethernet interface present')
 
