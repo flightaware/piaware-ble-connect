@@ -159,13 +159,6 @@ def advertising_should_be_on(piaware_configurator_url):
         Parameters:
         piaware_configurator_url (str): URL of piaware-configurator to request receiver data from
     '''
-    request = '{"request": "get_device_info"}'
-    response = http_json_post(piaware_configurator_url, json.loads(request))
-    if response is None or type(response) is not dict:
-        return None
-
-    image_type = response['response_payload']['image_type']
-
     request = '{"request": "get_device_state"}'
     response = http_json_post(piaware_configurator_url, json.loads(request))
     if response is None or type(response) is not dict:
@@ -175,11 +168,6 @@ def advertising_should_be_on(piaware_configurator_url):
         is_connected_to_internet = response['response_payload']['is_connected_to_internet']
         is_receiver_claimed = response['response_payload']['is_receiver_claimed']
 
-        # FlightFeeders allow BLE pairing if there is no internet connection
-        if image_type.startswith('flightfeeder'):
-            return False if is_connected_to_internet else True
-
-        # PiAware case
         return False if is_connected_to_internet and is_receiver_claimed else True
 
     except KeyError:
