@@ -28,7 +28,6 @@ def shutdown_ble_services():
     logger.info(f'Stopping PiAware Bluetooth LE services for piaware configuration')
 
     stop_systemd_service('piaware-wifi-scan.service')
-    stop_systemd_service('piaware-configurator.service')
     stop_systemd_service('piaware-ble-connect.service')
 
 def start_piaware_configurator():
