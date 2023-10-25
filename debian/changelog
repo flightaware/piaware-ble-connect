@@ -1,6 +1,8 @@
 piaware-ble-connect (9.0~dev) UNRELEASED; urgency=medium
 
-  * In development
+  * Add support for pairing with FlightFeeder devices
+  * Improve the LED name detection logic when blinking onboard LED to address different naming between kernels
+  * Remove disabling of piaware-configurator on BLE service shutdown
 
  -- Eric Tran <eric.tran@flightaware.com>  Tue, 13 Jun 2023 15:28:42 +0000
 
