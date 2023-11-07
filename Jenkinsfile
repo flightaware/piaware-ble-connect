@@ -4,23 +4,23 @@ node(label: 'raspberrypi') {
             durabilityHint(hint: 'PERFORMANCE_OPTIMIZED')
         ])
 
-    # --- configuration for an arch-indep package ---
+    // --- configuration for an arch-indep package ---
 
-    # The distributions we build on
+    // The distributions we build on
     def build_dist_list = [
       "bullseye"
     ]
 
-    # The distribution/architecture combinations we test-install on.
+    // The distribution/architecture combinations we test-install on.
     def test_dist_arch_list = [
       ["bullseye", "armhf"],
       ["bullseye", "arm64"]
     ]
 
-    # The list of packages to test-install, in the correct order to install.
+    // The list of packages to test-install, in the correct order to install.
     def test_package_list = ["piaware-ble-connect"]
 
-    # --- implementation ---
+    // --- implementation ---
 
     def srcdir = "${WORKSPACE}/src"
 
