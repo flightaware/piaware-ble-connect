@@ -47,7 +47,7 @@ node(label: 'raspberrypi') {
         stage("Build for ${dist}") {
           sh "rm -fr ${resultdir}"
           sh "mkdir -p ${resultdir}"
-          dir(srcdir) {
+          dir(pkgdir) {
             sh "DIST=${dist} BRANCH=${env.BRANCH_NAME} pdebuild --use-pdebuild-internal --debbuildopts -b --buildresult ${WORKSPACE}/${resultdir}"
           }
           archiveArtifacts artifacts: "${resultdir}/*.deb", fingerprint: true
