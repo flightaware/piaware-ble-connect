@@ -46,12 +46,12 @@ node(label: 'raspberrypi') {
         resultdirs[dist] = resultdir
 
         stage("Build for ${dist}") {
-          sh "rm -fr ${resultsdir}"
-          sh "mkdir -p ${resultsdir}"
+          sh "rm -fr ${resultdir}"
+          sh "mkdir -p ${resultdir}"
           dir(srcdir) {
-            sh "DIST=${dist} BRANCH=${env.BRANCH_NAME} pdebuild --use-pdebuild-internal --debbuildopts -b --buildresult ${WORKSPACE}/${resultsdir}"
+            sh "DIST=${dist} BRANCH=${env.BRANCH_NAME} pdebuild --use-pdebuild-internal --debbuildopts -b --buildresult ${WORKSPACE}/${resultdir}"
           }
-          archiveArtifacts artifacts: "${resultsdir}/*.deb", fingerprint: true
+          archiveArtifacts artifacts: "${resultdir}/*.deb", fingerprint: true
         }
     }
 
@@ -63,7 +63,7 @@ node(label: 'raspberrypi') {
 
       def test_debs = ""
       for (int j = 0; j < test_package_list.size(); ++j) {
-        test_debs += "${resultsdir}/${test_package_list[j]}_*.deb "
+        test_debs += "${resultdir}/${test_package_list[j]}_*.deb "
       }
 
       stage("Test install on ${dist} (${arch})") {
@@ -76,7 +76,7 @@ node(label: 'raspberrypi') {
             def dist = build_dist_list[i]
             def resultdir = resultdirs[dist]
 
-            sh "/build/pi-builder/scripts/deploy.sh -distribution ${dist} -branch ${env.BRANCH_NAME} ${resultsdir}/*.deb"
+            sh "/build/pi-builder/scripts/deploy.sh -distribution ${dist} -branch ${env.BRANCH_NAME} ${resultdir}/*.deb"
         }
     }
 }
