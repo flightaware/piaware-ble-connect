@@ -68,6 +68,7 @@ node(label: 'raspberrypi') {
 
       stage("Test install on ${dist} (${arch})") {
         sh "BRANCH=${env.BRANCH_NAME} ARCH=${arch} /build/pi-builder/scripts/validate-packages.sh ${dist} ${test_debs}"
+      }
     }
 
     stage("Deploy to internal repository") {
