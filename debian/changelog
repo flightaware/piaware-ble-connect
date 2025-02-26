@@ -1,8 +1,8 @@
-piaware-ble-connect (10.0~dev) UNRELEASED; urgency=medium
+piaware-ble-connect (10.0) stable; urgency=medium
 
-  * Added 10.0~dev for testing
+  * No change release for 10.0
 
- -- Nick Wan <nicholas.wan@flightaware.com>  Wed, 04 Dec 2024 17:43:07 +0000
+ -- Nicholas Wan <nicholas.wan@flightaware.com>  Wed, 26 Feb 2025 16:40:34 +0000
 
 piaware-ble-connect (9.0) stable; urgency=medium
 
