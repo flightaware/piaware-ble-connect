@@ -181,7 +181,7 @@ def ble_enabled(piaware_configurator_url):
 
     '''
     request = '{"request": "piaware_config_read", "request_payload": ["allow-ble-setup", "wireless-ssid"]}'
-    max_retries = 5
+    max_retries = 10
 
     # Retry requests to piaware-configurator in case it's not ready to serve requests
     for i in range(max_retries):
