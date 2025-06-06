@@ -58,9 +58,6 @@ case "$1" in
 
         adduser "$RUNAS" bluetooth
 
-        echo "Restarting dbus"
-        invoke_systemctl_noblock try-restart dbus
-
         echo "Restarting piaware-ble-connect server"
         invoke_systemctl_noblock try-restart piaware-ble-connect
     ;;
