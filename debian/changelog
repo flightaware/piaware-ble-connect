@@ -1,6 +1,12 @@
-piaware-ble-connect (10.2~dev) UNRELEASED; urgency=medium
+piaware-ble-connect (11.0~dev) UNRELEASED; urgency=medium
 
-  * No change release for 10.2
+  * In development
+
+ -- Ziquan Wang <ziquan.wang@flightaware.com>  Wed, 22 Apr 2026 09:26:02 -0500
+
+piaware-ble-connect (10.2) stable; urgency=medium
+
+  * No longer restart DBUS post install.
 
  -- Nicholas Wan <nicholas.wan@flightaware.com>  Wed, 28 May 2025 12:56:39 -0500
 
